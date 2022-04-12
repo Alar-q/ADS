@@ -1,6 +1,6 @@
 package Ass1;
 
-public class MyLinkedList<T> implements MyList<T> {
+public class MyLinkedList<T extends Comparable<T>> implements MyList<T> {
     private static class MyNode<T>{
         T data;
         MyNode<T> next, prev;
@@ -38,7 +38,7 @@ public class MyLinkedList<T> implements MyList<T> {
         }
         else if(index > length){
             // Idk how correct its to fill in the gaps with null values
-            int n = index - 1 - length;
+            int n = index - length;
             for(int i=0; i<n; i++)
                 this.add(null);
             this.add(item);
@@ -48,9 +48,8 @@ public class MyLinkedList<T> implements MyList<T> {
         }
         else {
             MyNode<T> temp = head;
-            while ((index - 1) != 0) {
+            for(int i=0; i<index; i++){
                 temp = temp.next;
-                index--;
             }
             temp.data = item;
         }
@@ -128,16 +127,22 @@ public class MyLinkedList<T> implements MyList<T> {
 
     @Override
     public void sort() {
-//        for (int i = 0; i < length - 1; i++){
-//            for (int j = 0; j < length - i - 1; j++){
-//                if (this.get(j) > this.get(j + 1)) { // why?!
-//                    // swap arr[j+1] and arr[j]
-//                    T temp = this.get(j);
-//                    this.add(this.get(j + 1), j);
-//                    this.add(temp, j+1);
-//                }
-//            }
-//        }
+        // bubble
+        for (int i = 0; i < length - 1; i++){
+            for (int j = 0; j < length - i - 1; j++){
+                T a = this.get(j);
+                T b = this.get(j + 1);
+                if (first_greater(a, b)) {
+                    // swap arr[j+1] and arr[j]
+                    this.add(b, j);
+                    this.add(a,j+1);
+                }
+            }
+        }
+    }
+
+    private boolean first_greater(T ob, T ob2){
+        return ob.compareTo(ob2) > 0;
     }
 
     @Override

@@ -1,14 +1,12 @@
 package Ass1;
 
-import java.util.Arrays;
-
-public class MyArrayList<T> implements MyList<T> {
+public class MyArrayList<T extends Comparable<T>> implements MyList<T> {
 
     private static final int INCREASE_FACTOR = 2;
     private static final int INITIAL_CAPACITY = 3;
 
     private Object[] array;
-    private int size = 0;
+    private int length = 0;
     private int capacity = INITIAL_CAPACITY;
 
     public MyArrayList() {
@@ -17,7 +15,7 @@ public class MyArrayList<T> implements MyList<T> {
 
     @Override
     public int size() {
-        return size;
+        return length;
     }
 
     @Override
@@ -30,9 +28,9 @@ public class MyArrayList<T> implements MyList<T> {
 
     @Override
     public void add(T item) {
-        if (size == capacity)
+        if (length == capacity)
             increaseCapacity();
-        array[size++] = item;
+        array[length++] = item;
     }
 
     public void increaseCapacity() {
@@ -44,27 +42,32 @@ public class MyArrayList<T> implements MyList<T> {
 
     @Override
     public void add(T item, int index) {
-        if (size == capacity)
-            increaseCapacity();
-
-        Object[] buf = new Object[size + 1];
-
-        for (int i = 0, j = 0; i < size; i++) {
-            if (i == index) {
-                j = 1;
-                buf[i] = item;
-            }
-            buf[i + j] = array[i];
+        if(index < length){
+            array[index] = item;
         }
-        size += 1;
-        array = buf;
+        else if(index == length){
+            this.add(item);
+        }
+        else{
+            while (index >= capacity)
+                increaseCapacity();
+            Object[] buf = new Object[capacity];
+            System.arraycopy(array, 0, buf, 0, length);
+
+            for(int i=length; i<index; i++)
+                buf[length + i] = null;
+            buf[index] = item;
+
+            length = index+1;
+            array = buf;
+        }
     }
 
     @Override
     public boolean removeItem(T item) {
         int index = -1;
 
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < length; i++) {
             if (array[i] == item) {
                 index = i;
                 break;
@@ -81,10 +84,10 @@ public class MyArrayList<T> implements MyList<T> {
 
     @Override
     public T remove(int index) {
-        Object[] res = new Object[size];
+        Object[] res = new Object[length];
         Object ob = null;
 
-        for (int i = 0, was = 0; i < size; i++) {
+        for (int i = 0, was = 0; i < length; i++) {
             if (i == index) {
                 was = 1;
                 ob = array[i];
@@ -93,14 +96,14 @@ public class MyArrayList<T> implements MyList<T> {
             res[i - was] = array[i];
         }
 
-        size -= 1;
+        length -= 1;
         array = res;
         return (T) ob;
     }
 
     @Override
     public void clear() {
-        size = 0;
+        length = 0;
         capacity = INITIAL_CAPACITY;
         array = new Object[capacity];
     }
@@ -112,7 +115,7 @@ public class MyArrayList<T> implements MyList<T> {
 
     @Override
     public int indexOf(Object o) {
-        for (int i = 0; i < size; i++)
+        for (int i = 0; i < length; i++)
             if (array[i] == o)
                 return i;
         return -1;
@@ -121,7 +124,7 @@ public class MyArrayList<T> implements MyList<T> {
     @Override
     public int lastIndexOf(Object o) {
         int lastIndex = -1;
-        for (int i = 0; i < size; i++)
+        for (int i = 0; i < length; i++)
             if (array[i] == o)
                 lastIndex = i;
         return lastIndex;
@@ -129,25 +132,21 @@ public class MyArrayList<T> implements MyList<T> {
 
     @Override
     public void sort() {
-        // comparing of generics throws an exception, idk
-        // boolean b = (T) array[0] > (T) array[1];
-        Arrays.sort(array);
-    }
-
-    private int[] bubbleSort(int arr[]) {
-//        int[] res = new int[arr.length];z
-        int n = arr.length;
-        for (int i = 0; i < n - 1; i++){
-            for (int j = 0; j < n - i - 1; j++){
-                if (arr[j] > arr[j + 1]) {
+        // bubble
+        for (int i = 0; i < length - 1; i++){
+            for (int j = 0; j < length - i - 1; j++){
+                T a = this.get(j);
+                T b = this.get(j + 1);
+                if (first_greater(a, b)) {
                     // swap arr[j+1] and arr[j]
-                    int temp = arr[j];
-                    arr[j] = arr[j + 1];
-                    arr[j + 1] = temp;
+                    this.add(b, j);
+                    this.add(a,j+1);
                 }
             }
         }
-        return arr;
     }
 
+    private boolean first_greater(T ob, T ob2){
+        return ob.compareTo(ob2) > 0;
+    }
 }
