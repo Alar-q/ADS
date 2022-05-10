@@ -1,7 +1,13 @@
 package Ass3.HashTable;
 
 /**
- *  Не обрабатывает повторяющиеся ключи
+ * Dynamically increases if the length of the longest linkedlist 
+ * is greater than the size of the chainArray.
+ * 
+ * 0: {3}, {6}
+ * 1: {1}, {4}
+ * 2: {2}, {5}, {8} <- increase next time
+ * 
  * */
 
 public class MyHashTable<K extends Comparable<K>, V extends Comparable<V>> {
