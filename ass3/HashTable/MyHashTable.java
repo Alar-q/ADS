@@ -24,6 +24,12 @@ public class MyHashTable<K extends Comparable<K>, V extends Comparable<V>> {
 
     private MyHashNode<K, V>[] chainArray;
     private int M = 11;
+    /**
+     *  Store the size of each "linkedlist" in an array. 
+     *  This is more convenient to change the longest "linkedlist" when deleting an element
+     *  than storing only the length of the longest 
+     *  and does not take up much space. 
+     *  */
     private int sizes[];
 
 
@@ -70,21 +76,21 @@ public class MyHashTable<K extends Comparable<K>, V extends Comparable<V>> {
         for(int i: sizes)
             if(i > max) max = i;
 
-        if(max > M){
+        if(max > M){ // Такой себе квадрат
             int prevM = M;
             MyHashNode<K, V>[] prevChainArray = chainArray;
 
             M = (int) (M * 1.5d);
-            if(M % 2 == 0) M++;
+            // Why we should use only odd M?
+            if(M % 2 == 0) M++; 
 
             sizes = new int[M];
 
             chainArray = new MyHashNode[M];
 
-            for(int k=0; k < prevM; k++){
+            for(int k=0; k < prevM; k++)
                 for(MyHashNode<K, V> n = prevChainArray[k]; n != null; n = n.next)
                     add_verified_node(n.key, n.value);
-            }
         }
     }
 
@@ -111,13 +117,16 @@ public class MyHashTable<K extends Comparable<K>, V extends Comparable<V>> {
 
         if (head == null) {
             System.out.println("List is empty. No such key.");
-        } else if (head.key.equals(key)) {
+        } 
+        else if (head.key.equals(key)) {
             removed = head.value;
             chainArray[hash] = head.next;
-        } else {
+        } 
+        else { 
             // У нас нет prev, приходится использовать node.next.next
             // head = prev
             while (head.next != null) {
+                // Сложноватая логика
                 // head -> head.next -> head.next.next
                 if (head.next.key.equals(key)) {
                     removed = head.next.value;
@@ -153,7 +162,6 @@ public class MyHashTable<K extends Comparable<K>, V extends Comparable<V>> {
 
     public boolean containsK(K key) {
         for (int i = 0; i < M; i++)
-//            MyHashNode<K, V> head = chainArray[i];
             for (MyHashNode<K, V> head = chainArray[i]; head != null; head = head.next)
                 if (head.key.equals(key))
                     return true;
@@ -181,7 +189,7 @@ public class MyHashTable<K extends Comparable<K>, V extends Comparable<V>> {
         return (key.hashCode() & 0x7fffffff) % M;
     }
 
-
+    
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
