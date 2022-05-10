@@ -1,25 +1,22 @@
 package Ass3.HashTable;
 
-import Ass3.DataStruct.MyList;
-
-import java.util.Iterator;
-
 /**
  *  Не обрабатывает повторяющиеся ключи
  * */
 
-public class MyHashTable<K extends Comparable<K>, V extends Comparable<V>>{
-    private static class MyHashNode<K, V>{
+public class MyHashTable<K extends Comparable<K>, V extends Comparable<V>> {
+    private static class MyHashNode<K, V> {
         public K key;
         public V value;
         public MyHashNode<K, V> next;
 
-        public MyHashNode(K key, V value){
+        public MyHashNode(K key, V value) {
             this.key = key;
             this.value = value;
         }
+
         @Override
-        public String toString(){
+        public String toString() {
             return "{" + key + ", " + value + "}";
         }
     }
@@ -27,37 +24,76 @@ public class MyHashTable<K extends Comparable<K>, V extends Comparable<V>>{
 
     private MyHashNode<K, V>[] chainArray;
     private int M = 11;
-    private int size = 0;
+    private int sizes[];
 
 
-    public MyHashTable(){
+    public MyHashTable() {
         this(11);
     }
-    public MyHashTable(int M){
+
+    public MyHashTable(int M) {
         this.M = M;
         this.chainArray = new MyHashNode[M];
+        this.sizes = new int[M];
     }
 
 
-    public void put(K key, V value){
+    public void put(K key, V value) {
+        increaseLogic();
+
+        int hash = hash(key);
+        MyHashNode<K, V> head = chainArray[hash];
+
+        boolean isKeyExist = false;
+        for (MyHashNode<K, V> n = head; n != null; n = n.next) {
+            if (n.key.equals(key)) {
+                isKeyExist = true;
+                n.value = value;
+                break;
+            }
+        }
+
+        if (!isKeyExist)
+            add_verified_node(key, value);
+    }
+
+    private void add_verified_node(K key, V value){
         MyHashNode<K, V> newNode = new MyHashNode<>(key, value);
-
-        int hash = hash(key);
-        MyHashNode<K, V> head = chainArray[hash];
-
-        newNode.next = head; // Ничего если head = null
+        int hash = hash(newNode.key);
+        newNode.next = chainArray[hash]; // Ничего если head = null
         chainArray[hash] = newNode;
-
-        size++;
+        sizes[hash]++;
     }
 
+    public void increaseLogic(){
+        int max = Integer.MIN_VALUE;
+        for(int i: sizes)
+            if(i > max) max = i;
 
-    public V get(K key){
+        if(max > M){
+            int prevM = M;
+            MyHashNode<K, V>[] prevChainArray = chainArray;
+
+            M = (int) (M * 1.5d);
+            if(M % 2 == 0) M++;
+
+            sizes = new int[M];
+
+            chainArray = new MyHashNode[M];
+
+            for(int k=0; k < prevM; k++){
+                for(MyHashNode<K, V> n = prevChainArray[k]; n != null; n = n.next)
+                    add_verified_node(n.key, n.value);
+            }
+        }
+    }
+
+    public V get(K key) {
         int hash = hash(key);
         MyHashNode<K, V> head = chainArray[hash];
-        while(head != null){
+        while (head != null) {
             // базовый случай прерывания - прошли по всем node-ам
-            if(head.key.equals(key)){
+            if (head.key.equals(key)) {
                 // цикл прерывается из-за совпадения ключей. !head не null!
                 break;
             }
@@ -68,17 +104,17 @@ public class MyHashTable<K extends Comparable<K>, V extends Comparable<V>>{
     }
 
 
-    public V remove(K key){
+    public V remove(K key) {
         int hash = hash(key);
         MyHashNode<K, V> head = chainArray[hash];
         V removed = null;
 
-        if(head == null){}
-        else if(head.key.equals(key)){
+        if (head == null) {
+            System.out.println("List is empty. No such key.");
+        } else if (head.key.equals(key)) {
             removed = head.value;
             chainArray[hash] = head.next;
-        }
-        else {
+        } else {
             // У нас нет prev, приходится использовать node.next.next
             // head = prev
             while (head.next != null) {
@@ -92,18 +128,21 @@ public class MyHashTable<K extends Comparable<K>, V extends Comparable<V>>{
             }
         }
 
-        if(removed != null) size--;
+        if (removed != null)
+            sizes[hash]--;
 
         return removed;
     }
 
-    /** Разными способами написал contains*/
+    /**
+     * Разными способами написал contains
+     */
 
-    public boolean containsV(V value){
+    public boolean containsV(V value) {
         for (int i = 0; i < M; i++) {
             MyHashNode<K, V> head = chainArray[i];
-            while(head != null){
-                if(head.value.equals(value)){
+            while (head != null) {
+                if (head.value.equals(value)) {
                     return true;
                 }
                 head = head.next;
@@ -112,11 +151,11 @@ public class MyHashTable<K extends Comparable<K>, V extends Comparable<V>>{
         return false;
     }
 
-    public boolean containsK(K key){
+    public boolean containsK(K key) {
         for (int i = 0; i < M; i++)
 //            MyHashNode<K, V> head = chainArray[i];
-            for(MyHashNode<K, V> head = chainArray[i]; head != null; head = head.next)
-                if(head.key.equals(key))
+            for (MyHashNode<K, V> head = chainArray[i]; head != null; head = head.next)
+                if (head.key.equals(key))
                     return true;
         return false;
     }
@@ -126,8 +165,8 @@ public class MyHashTable<K extends Comparable<K>, V extends Comparable<V>>{
         K key = null;
         for (int i = 0; i < M; i++) {
             MyHashNode<K, V> head = chainArray[i];
-            while(head != null){
-                if(head.value.equals(value)){
+            while (head != null) {
+                if (head.value.equals(value)) {
                     key = head.key;
                     break;
                 }
@@ -138,18 +177,18 @@ public class MyHashTable<K extends Comparable<K>, V extends Comparable<V>>{
     }
 
 
-    private int hash(K key){
+    private int hash(K key) {
         return (key.hashCode() & 0x7fffffff) % M;
     }
 
 
     @Override
-    public String toString(){
+    public String toString() {
         StringBuilder sb = new StringBuilder();
-        for(int i=0; i<M; i++){
+        for (int i = 0; i < M; i++) {
             sb.append(i).append(":");
             MyHashNode<K, V> head = chainArray[i];
-            while(head != null){
+            while (head != null) {
                 sb.append(head).append(", ");
                 head = head.next;
             }
@@ -158,4 +197,7 @@ public class MyHashTable<K extends Comparable<K>, V extends Comparable<V>>{
         return sb.toString();
     }
 
+    public int[] sizes() {
+        return sizes;
+    }
 }

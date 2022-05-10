@@ -1,6 +1,6 @@
 package Ass3.BST;
 
-class test {
+class Test {
     public static void main(String[] args) {
         MyBST<Double, Integer> bst = new MyBST<>();
         bst.put(5d, 5);
