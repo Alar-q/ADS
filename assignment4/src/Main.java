@@ -23,6 +23,8 @@ public class Main {
 //        System.out.println("BFS:");
 //        Search<String> bfs = new BreadthFirstSearch<>(graph, "Almaty");
 //        outputPath(bfs, "Kyzylorda");
+
+        System.out.println("\n\nGraph:\n" + graph.toString());
     }
 
     public static void outputPath(Search<String> search, String key) {
