@@ -88,13 +88,18 @@ public class MyHeap<T extends Comparable<T>> {
     }
 
     private int leftChild(int index){
-        return 2*index + 1;
+        // same approach
+        // return (2 * (index + 1)) - 1; // -1 - преобразуем обратно в [0, inf)
+        return 2 * index + 1;
     }
     private int rightChild(int index){
-        return 2*index + 2;
+        // same approach
+        // return (2 * (index + 1)) *//* + 1 - 1 *//*;
+        return 2 *index + 2;
     }
     private int parent(int index){
-        return (index-1) / 2;
+        // return ((index + 1) / 2) - 1;
+        return (index - 1) / 2;
     }
 
     public int size(){
