@@ -1,6 +1,5 @@
 package Assignment4;
 
-import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -19,7 +18,6 @@ public class Vertex<T> {
         adjacents.put(dest, weight);
     }
 
-    @Nullable
     public Double getWeight(T v){
         return adjacents.get(v);
     }
